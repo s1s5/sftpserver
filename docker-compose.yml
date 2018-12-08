@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "sleep 5; python manage.py migrate --noinput; python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_TYPE=postgres
+      - DB_ADDR=db
+      - DB_PORT=5432
