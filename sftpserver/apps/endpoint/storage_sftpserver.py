@@ -155,11 +155,14 @@ class StubSFTPHandle(paramiko.SFTPHandle):
                 fstr = 'r+b'
         else:  # O_RDONLY (== 0)
             fstr = 'rb'
-
         fileobj = storage.open(path, fstr)
         self._modified = False
-        self.readfile = fileobj
-        self.writefile = fileobj
+        if 'r' in fstr or 'a' in fstr:
+            self.readfile = fileobj
+        elif 'w' in fstr or 'a' in fstr:
+            self.writefile = fileobj
+        if 'a' in fstr:
+            self.writefile.close = lambda *args, **kwargs: None
 
     @_log_error
     def stat(self):
