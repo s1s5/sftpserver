@@ -44,7 +44,7 @@ Endpoint / Storage access infos -> new
 
 
 ## run sftpserver
-`$ python manage.py run_sftpserver --storage-mode -k /etc/ssh/ssh_host_rsa_key`
+`$ python manage.py run_sftpserver --storage-mode -k ./test_host_key`
 
 ## access storage
 `$ sftp -i ~/.ssh/id_rsa -P 2222 access_user@localhost`
