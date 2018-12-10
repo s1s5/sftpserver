@@ -6,9 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     # command: bash -c "sleep 5; python manage.py migrate --noinput; python manage.py runserver 0.0.0.0:8000"
-    command: bash -c "sleep 5; python manage.py migrate --noinput; gunicorn 'sftpserver.wsgi:application' --name sftp_admin --workers 1 -b 0.0.0.0:8000 --access-logfile - --error-logfile - --log-level info"
-    # environment:
-    #   - STATIC_ROOT=/tmp/staticfiles
+    command: bash -c "sleep 5; python manage.py collectstatic --noinput; python manage.py migrate --noinput; gunicorn 'sftpserver.wsgi:application' --name sftp_admin --workers 1 -b 0.0.0.0:8000 --access-logfile - --error-logfile - --log-level info"
+    environment:
+      - STATIC_ROOT=/tmp/staticfiles
 
   sftp:
     extends: web

@@ -35,7 +35,7 @@ PROJECT_NAME = os.path.basename(PROJECT_DIR)
 SECRET_KEY = env('SECRET_KEY', default='4ri6&(-z(&+#jpmau#ai7agx_gtk$a5wv0kk42@wn8snd3rsk(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*', ])
 SERVER_NAME = env('SERVER_NAME', default='')
@@ -94,6 +94,41 @@ CACHES = {
     'default': env.cache(default='locmemcache://'),
 }
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+            'datefmt': '%y %b %d, %H:%M:%S',
+        },
+        'verbose': {
+            'format': ('%(levelname)s %(asctime)s %(module)s '
+                       '%(process)d %(thread)d %(message)s'),
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        os.path.basename(PROJECT_NAME): {
+            'handlers': ['console', ],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console', ],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -138,16 +173,11 @@ if sys.version_info[0] == 2:
 else:
     TZ_INFO = datetime.timezone(datetime.timedelta(hours=9))
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = env('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
 AWS_DEFAULT_ACL = None
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
