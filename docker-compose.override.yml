@@ -17,18 +17,16 @@ services:
       - pg_data:/postgres/data
     command: postgres -c max_connections=1000
   web:
+    environment:
+      - DATABASE_URL=psql://postgres:postgres@db:5432/postgres
     volumes:
       - ./sftpserver:/app/sftpserver
     ports:
       - "42037:8000"
   sftp:
-    extends: web
-    command: bash -c "sleep 5; python manage.py run_sftpserver --storage-mode -k /run/secrets/ssh_host_key"
     volumes:
       - ./test_host_key:/run/secrets/ssh_host_key
     environment:
-      - DB_TYPE=postgres
-      - DB_ADDR=db
-      - DB_PORT=5432
+      - DATABASE_URL=psql://postgres:postgres@db:5432/postgres
     ports:
       - "22222:2222"

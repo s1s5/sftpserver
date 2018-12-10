@@ -13,9 +13,17 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import sys
 import os
 import datetime
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, False),
+)
+env_file = os.environ.get('DJANGO_ENV_FILE_NAME', '.env')
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(__file__)
 PROJECT_NAME = os.path.basename(PROJECT_DIR)
 
@@ -24,13 +32,13 @@ PROJECT_NAME = os.path.basename(PROJECT_DIR)
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4ri6&(-z(&+#jpmau#ai7agx_gtk$a5wv0kk42@wn8snd3rsk('
+SECRET_KEY = env('SECRET_KEY', default='4ri6&(-z(&+#jpmau#ai7agx_gtk$a5wv0kk42@wn8snd3rsk(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = eval(os.environ.get('ALLOWED_HOSTS', "['*', ]"))
-SERVER_NAME = os.environ.get('SERVER_NAME', '')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*', ])
+SERVER_NAME = env('SERVER_NAME', default='')
 
 
 # Application definition
@@ -48,6 +56,7 @@ SESSION_COOKIE_NAME = '{}-sessionid'.format(PROJECT_NAME)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,32 +86,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sftpserver.wsgi.application'
 
+DATABASES = {
+    'default': env.db(default='sqlite:////tmp/db.sqlite3'),
+}
 
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-db_type = os.environ.get('DB_TYPE', 'sqlite')
-if db_type == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-elif db_type == 'postgres':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
-            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
-            'HOST': os.environ.get('DB_ADDR', 'db'),
-            'PORT': os.environ.get('DB_PORT', 5432),
-        }
-    }
-else:
-    raise Exception('unknown database type "{}"'.format(db_type))
-
+CACHES = {
+    'default': env.cache(default='locmemcache://'),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -158,5 +148,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = env('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
 AWS_DEFAULT_ACL = None
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
