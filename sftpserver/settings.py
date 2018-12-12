@@ -181,3 +181,15 @@ STATIC_ROOT = env('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
 AWS_DEFAULT_ACL = None
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+if env('SENTRY_DSN', default=None):
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+
+        sentry_sdk.init(
+                dsn=env('SENTRY_DSN'),
+                integrations=[DjangoIntegration()]
+            )
+    except ImportError:
+        pass
