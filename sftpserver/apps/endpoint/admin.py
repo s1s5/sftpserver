@@ -48,3 +48,6 @@ class StorageAccessInfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'password_auth', 'single_storage_mode', )
 
 
+@admin.register(models.UserExtraIPAddress)
+class StorageAccessInfoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'ip_addr', )

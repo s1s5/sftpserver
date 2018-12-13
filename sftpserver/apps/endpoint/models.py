@@ -364,3 +364,8 @@ class UserExtra(models.Model):
     password_auth = models.BooleanField(default=False)
     single_storage_mode = models.BooleanField(default=False)
 
+
+@python_2_unicode_compatible
+class UserExtraIPAddress(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    ip_addr = models.GenericIPAddressField()
