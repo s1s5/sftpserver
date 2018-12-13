@@ -367,5 +367,5 @@ class UserExtra(models.Model):
 
 @python_2_unicode_compatible
 class UserExtraIPAddress(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ip_addr = models.GenericIPAddressField()
