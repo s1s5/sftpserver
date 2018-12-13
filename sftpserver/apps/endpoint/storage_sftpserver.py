@@ -93,6 +93,18 @@ class StubServer(paramiko.ServerInterface):
                 return False
         self.username = username
         self.user = get_user_model().objects.get(username=username)
+
+        qs = models.UserExtraIPAddress.objects.filter(user=self.user)
+        if qs.exists():
+            logger.info("checking IP from {}".format(self.client_addr))
+            flag = True
+            for i in qs:
+                if i.ip_addr == self.client_addr[0]:
+                    flag = False
+                    break
+            if flag:
+                return False
+
         self.storage_name = storage_name
         if self.storage_name is None:
             single_storage_mode = False
