@@ -41,3 +41,10 @@ class CommitItemAdmin(admin.ModelAdmin):
 @admin.register(models.StorageAccessInfo)
 class StorageAccessInfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'storage_class', 'args', 'kwargs')
+
+
+@admin.register(models.UserExtra)
+class StorageAccessInfoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'password_auth', 'single_storage_mode', )
+
+

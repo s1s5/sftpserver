@@ -95,17 +95,41 @@ class StubServer(paramiko.ServerInterface):
         self.user = get_user_model().objects.get(username=username)
         self.storage_name = storage_name
         if self.storage_name is None:
+            single_storage_mode = False
+            qs = models.UserExtra.objects.filter(user=self.user)
+            single_storage_mode = qs.exists() and qs[0].single_storage_mode
+
             valid_count = 0
             self.storage_access_info = None
+            _storage = None
             for sai in models.StorageAccessInfo.objects.all():
                 if sai.has_permission(self.user):
+                    _storage = sai
                     valid_count += 1
             if valid_count == 0:
                 return False
+            if valid_count == 1 and single_storage_mode:
+                self.storage_name = _storage.name
+                self.storage_access_info = _storage
             return True
         else:
             self.storage_access_info = models.StorageAccessInfo.objects.get(name=self.storage_name)
         return self.storage_access_info.has_permission(self.user)
+
+    @_log_error
+    def check_auth_password(self, username, password):
+        logger.debug('authenticating {} with password'.format(username))
+        try:
+            if not self._set_username(username):
+                return paramiko.AUTH_FAILED
+        except get_user_model().DoesNotExist:
+            return paramiko.AUTH_FAILED
+        except models.StorageAccessInfo.DoesNotExist:
+            return paramiko.AUTH_FAILED
+        qs = models.UserExtra.objects.filter(user=self.user)
+        if qs.exists() and qs[0].password_auth:
+            return paramiko.AUTH_SUCCESSFUL if self.user.check_password(password) else paramiko.AUTH_FAILED
+        return paramiko.AUTH_FAILED
 
     @_log_error
     def check_auth_publickey(self, username, key):
@@ -130,6 +154,9 @@ class StubServer(paramiko.ServerInterface):
 
     @_log_error
     def get_allowed_auths(self, username):
+        qs = models.UserExtra.objects.filter(user__username=username)
+        if qs.exists() and qs[0].password_auth:
+            return "password,publickey"
         return "publickey"
 
 

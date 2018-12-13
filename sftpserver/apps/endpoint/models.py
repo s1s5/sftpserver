@@ -356,3 +356,11 @@ url_protocol: https
 
     def has_permission(self, user):
         return bool(user in self.users.all())
+
+
+@python_2_unicode_compatible
+class UserExtra(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    password_auth = models.BooleanField(default=False)
+    single_storage_mode = models.BooleanField(default=False)
+
