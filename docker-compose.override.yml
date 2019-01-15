@@ -22,7 +22,7 @@ services:
     volumes:
       - ./sftpserver:/app/sftpserver
     ports:
-      - "42037:8000"
+      - "42038:8000"
   sftp:
     volumes:
       - ./test_host_key:/run/secrets/ssh_host_key
