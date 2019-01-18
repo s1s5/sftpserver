@@ -49,3 +49,6 @@ Endpoint / Storage access infos -> new
 ## access storage
 `$ sftp -i ~/.ssh/id_rsa -P 2222 access_user@localhost`
 
+# TODO
+- [ ] RDS storage
+- [ ] SVN storage
