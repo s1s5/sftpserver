@@ -52,3 +52,5 @@ Endpoint / Storage access infos -> new
 # TODO
 - [ ] RDS storage
 - [ ] SVN storage
+- [ ] add group management
+- [ ] separate auth server, storage info
